@@ -74,7 +74,7 @@ puntos_proy = np.array([
     [405, 243]
 ])
 
-#Crear la matriz de coeficientes para resolver el sistema de ecuaciones
+#Crear la matriz de coeficientes A para resolver el sistema de ecuaciones
 A = np.empty((0, 9))
 for i in range(9):
     row1 = [-puntos_proy[i, 0], -puntos_proy[i, 1], -1, 0, 0, 0,
@@ -89,23 +89,28 @@ solution = V[-1, :]  # El último vector propio de V
 
 H = np.reshape(solution, (3, 3))
 
-# Normaliza la solución
+# Normalizar H
 H = H / H[2, 2]
 
 print("H = ")
 print(H)
 
-# Aplicar la transformación perspectiva utilizando la matriz H
+# Aplicar la transformación a la imagen utilizando la matriz H
 imagen_corregida = warp_perspective(imagen_proyectada, H, (imagen_modelo.shape[1], imagen_modelo.shape[0]))
 
 # Guardar la imagen ortogonal resultante
 cv2.imwrite('Imagen_corregida.jpg', imagen_corregida)
 
+# Atenuante
 alpha = 0.5
 
+
+#Ajustar tamaño de la imagen para sobreponerlas
 imagen_modelo = cv2.resize(imagen_modelo, (imagen_corregida.shape[1], imagen_corregida.shape[0]))
 
+
+# Sobreponer imagenes
 overlapped_images = cv2.addWeighted(imagen_corregida, alpha, imagen_modelo, 1 - alpha, 0)
 
-
+# Guardar imagen superpuesta
 cv2.imwrite('Overlapped_images.jpg', overlapped_images)
